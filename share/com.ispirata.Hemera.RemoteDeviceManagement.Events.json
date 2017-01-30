@@ -1,0 +1,27 @@
+{
+    "interface": "com.ispirata.Hemera.RemoteDeviceManagement.Events",
+    "version_major": 1,
+    "version_minor": 0,
+    "type": "datastream",
+    "quality": "producer",
+    "mappings": [
+        {
+            "path": "/rebootEvent",
+            "type": "datetime",
+            "reliability": "unique",
+            "retention": "stored"
+        },
+        {
+            "path": "/shutdownEvent",
+            "type": "datetime",
+            "reliability": "unique",
+            "retention": "stored"
+        },
+        {
+            "path": "/factoryResetEvent",
+            "type": "datetime",
+            "reliability": "unique",
+            "retention": "stored"
+        }
+    ]
+}

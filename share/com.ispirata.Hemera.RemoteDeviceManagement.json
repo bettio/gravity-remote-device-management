@@ -1,0 +1,27 @@
+{
+    "interface": "com.ispirata.Hemera.RemoteDeviceManagement",
+    "version_major": 1,
+    "version_minor": 0,
+    "type": "datastream",
+    "quality": "consumer",
+    "mappings": [
+        {
+            "path": "/shutdown",
+            "type": "integer",
+            "reliability": "unique",
+            "retention": "discard"
+        },
+        {
+            "path": "/reboot",
+            "type": "integer",
+            "reliability": "unique",
+            "retention": "discard"
+        },
+        {
+            "path": "/factoryreset",
+            "type": "integer",
+            "reliability": "unique",
+            "retention": "discard"
+        }
+    ]
+}
