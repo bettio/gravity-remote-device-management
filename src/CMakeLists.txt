@@ -17,7 +17,6 @@ target_link_libraries(gravity-center-plugin-remote-device-management
                       HemeraQt5SDK::Core
                       HyperspaceQt5::Core HyperspaceQt5::ProducerConsumer
                       Qt5::Core Qt5::Network Qt5::DBus
-                      ${LIBSYSTEMD_JOURNAL_LIBRARIES}
                      )
 
 # Install phase

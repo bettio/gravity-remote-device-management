@@ -11,7 +11,6 @@
 
 #include <GravitySupermassive/DeviceManagement>
 
-#include <systemd/sd-journal.h>
 #include <unistd.h>
 
 Q_LOGGING_CATEGORY(LOG_REMOTEDEVICEMANAGEMENT, "RemoteDeviceManagement")
