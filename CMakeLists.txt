@@ -30,7 +30,6 @@ find_package(Qt5 COMPONENTS Core Concurrent Network DBus Qml REQUIRED)
 find_package(HemeraQt5SDK 0.8.90 COMPONENTS Core Generators Qml REQUIRED)
 find_package(HyperspaceQt5 0.90.0 COMPONENTS Core ProducerConsumer REQUIRED)
 find_package(Gravity 0.90.0 COMPONENTS Supermassive REQUIRED)
-find_package(Systemd REQUIRED)
 # Needed for finding modules with pkg-config
 find_package(PkgConfig REQUIRED)
 
