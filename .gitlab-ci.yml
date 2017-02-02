@@ -1,0 +1,76 @@
+before_script:
+    # Install packages
+    - zypper ref
+    - zypper --non-interactive in openssh-clients tar xz git
+
+    # Run ssh-agent (inside the build environment)
+    - eval $(ssh-agent -s)
+
+    # Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
+    # For Docker builds disable host key checking. Be aware that by adding that
+    # you are suspectible to man-in-the-middle attacks.
+    # WARNING: Use this only with the Docker executor, if you use it with shell
+    # you will overwrite your user's SSH config.
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+variables:
+    PROJECT_NAME: "gravity-remote-device-management"
+
+stages:
+    - build
+    - deploy
+
+build:next:
+    image: $CI_REGISTRY/hemera-sdk/hemera-docker:next
+    stage: build
+    script:
+        # Install additional packages
+        - zypper --non-interactive in cmake make gcc gcc-c++ common-cmake-modules qt5-qtgui-devel qt5-qtnetwork-devel qt5-qtdbus-devel qt5-qttest-devel qt5-qtwidgets-devel qt5-qtdeclarative-qtquick-devel qt5-qtquick1-devel qt5-qtconcurrent-devel qt5-linguist qt5-qtjsonstream-devel libuser-devel libconnman-qt5-devel systemd-devel libzypp-devel
+        # Build Qt5SDK
+        - git clone git@git.ispirata.com:hemera-core/qt5-sdk.git
+        - cd qt5-sdk
+        # Branches: Enable this if there's a straight dependency on a stable branch (or just use repositories)
+        #- git checkout $CI_BUILD_REF_NAME
+        - mkdir build
+        - cd build
+        - cmake -DENABLE_WERROR=ON -DCMAKE_INSTALL_PREFIX=/usr -DHEMERA_QT5_SDK_PRIVATE_COMPONENTS=ON ..
+        - make -j4 install
+        - cd ../..
+        # Build Gravity
+        - git clone git@git.ispirata.com:hemera-core/gravity.git
+        - cd gravity
+        # Branches: Enable this if there's a straight dependency on a stable branch (or just use repositories)
+        #- git checkout $CI_BUILD_REF_NAME
+        - mkdir build
+        - cd build
+        - cmake -DENABLE_WERROR=ON -DCMAKE_INSTALL_PREFIX=/usr ..
+        - make -j4 install
+        - cd ../..
+        # Build Hyperspace-Qt5
+        - git clone git@git.ispirata.com:hemera-core/hyperspace-qt5.git
+        - cd hyperspace-qt5
+        # Branches: Enable this if there's a straight dependency on a stable branch (or just use repositories)
+        #- git checkout $CI_BUILD_REF_NAME
+        - mkdir build
+        - cd build
+        - cmake -DENABLE_WERROR=ON -DCMAKE_INSTALL_PREFIX=/usr ..
+        - make -j4 install
+        - cd ../..
+         # Build Gravity Software Manager Plugin, at last.
+        - mkdir build
+        - cd build
+        - cmake -DENABLE_WERROR=ON ..
+        - make -j4
+
+deploy:
+    image: $CI_REGISTRY/hemera-sdk/hemera-docker:next
+    stage: deploy
+    only:
+        - tags
+    script:
+        - export RELEASE_NAME=$(echo $CI_BUILD_TAG | sed 's/v//g')
+        - git archive --format tar --prefix=$PROJECT_NAME-$RELEASE_NAME/ HEAD | xz -9 > $PROJECT_NAME-$RELEASE_NAME.tar.xz
+        - scp $PROJECT_NAME-$RELEASE_NAME.tar.xz uploader@distfiles.hemera.ispirata.biz:/var/www/ispirata_proprietary/
