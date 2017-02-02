@@ -16,7 +16,9 @@
 Q_LOGGING_CATEGORY(LOG_REMOTEDEVICEMANAGEMENT, "RemoteDeviceManagement")
 
 RemoteDeviceManagement::RemoteDeviceManagement(Gravity::GalaxyManager *manager, QObject *parent)
-    : Hemera::AsyncInitObject(parent)
+    : Hemera::AsyncInitObject(parent),
+    , m_remoteDeviceManagementEventsProducer(nullptr)
+    , m_remoteDeviceManagementConsumer(nullptr)
 {
 }
 
@@ -26,11 +28,8 @@ RemoteDeviceManagement::~RemoteDeviceManagement()
 
 void RemoteDeviceManagement::initImpl()
 {
-    //TODO: LOL?
-    QTimer::singleShot(30000, this, [this] () {
-        m_remoteDeviceManagementEventsProducer = new RemoteDeviceManagementEventsProducer(this);
-        m_remoteDeviceManagementConsumer = new RemoteDeviceManagementConsumer(this);
-    });
+    m_remoteDeviceManagementEventsProducer = new RemoteDeviceManagementEventsProducer(this);
+    m_remoteDeviceManagementConsumer = new RemoteDeviceManagementConsumer(this);
 
     setReady();
 }
